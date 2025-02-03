@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main  # Trigger action on push to the 'main' branch
+  pull_request:
+    branches:
+      - main  # Optionally trigger action on pull requests
 
 jobs:
   build:
@@ -31,8 +34,13 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
         
+      # Tag the image with 'latest'
+      - name: Tag Docker image as 'latest'
+        run: |
+          docker tag ghcr.io/${{ github.repository }}:${{ github.sha }} ghcr.io/${{ github.repository }}:latest
+
       # Push the Docker image to GitHub Container Registry
       - name: Push Docker image to GHCR
         run: |
           docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
-
+          docker push ghcr.io/${{ github.repository }}:latest

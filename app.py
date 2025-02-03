@@ -1,16 +1,20 @@
 from flask import Flask
-import sys
+import os
+import threading
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/")
 def hello():
-    return 'Server will exit after this request', 200
+    return "Coffee Drank!"
 
+# Shutdown the server AFTER sending the response
 @app.after_request
-def after_request(response):
-    sys.exit()  # Exits the server after handling one request
-    return response
+def shutdown(response):
+    def shutdown_server():
+        os._exit(0)  # Terminates the process cleanly
+    threading.Timer(0.1, shutdown_server).start()  # Exit after 1 second
+    return response  # Return response first, then exit
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
